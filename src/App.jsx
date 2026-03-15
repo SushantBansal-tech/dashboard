@@ -1,24 +1,43 @@
 import { Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import List from "./pages/List";
-import Details from "./pages/Details";
-import Analytics from "./pages/Analytics";
-import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/login";
+import List from "./pages/list";
+import Details from "./pages/details";
+//import Analytics from "./pages/analytics";
+import ProtectedRoute from "./components/protectedRoutes";
 
 function App() {
   return (
     <Routes>
+
       <Route path="/" element={<Login />} />
+
       <Route
-  path="/list"
-  element={
-    <ProtectedRoute>
-      <List />
-    </ProtectedRoute>
-  }
-/>
-      <Route path="/details/:id" element={<Details />} />
-      <Route path="/analytics" element={<Analytics />} />
+        path="/list"
+        element={
+          <ProtectedRoute>
+            <List />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/details/:id"
+        element={
+          <ProtectedRoute>
+            <Details />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <Analytics />
+          </ProtectedRoute>
+        }
+      /> */}
+
     </Routes>
   );
 }

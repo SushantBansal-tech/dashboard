@@ -1,60 +1,98 @@
 import { useEffect, useState } from "react";
 
-export default function List(){
+export default function List() {
 
-  const [data,setData] = useState([]);
+  const [data, setData] = useState([]);
 
-  useEffect(()=>{
+  const containerHeight = 400;
+  const rowHeight = 50;
+  const visibleCount = Math.ceil(containerHeight / rowHeight) + 3; // buffer
 
-    fetch("https://backend.jotish.in/backend_dev/gettabledata.php",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
+  const [indices, setIndices] = useState([0, visibleCount]);
+
+  useEffect(() => {
+
+    fetch("https://backend.jotish.in/backend_dev/gettabledata.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
       },
-      body:JSON.stringify({
-        username:"test",
-        password:"123456"
+      body: JSON.stringify({
+        username: "test",
+        password: "123456"
       })
     })
-    .then(res=>res.json())
-    .then(res=>{
-      setData(res.data || [])
-    });
+      .then(res => res.json())
+      .then(res => {
+        setData(res.data || []);
+      });
 
-  },[]);
+  }, []);
 
-  return(
+  const handleScroll = (e) => {
+
+    const scrollTop = e.target.scrollTop;
+
+    const startIndex = Math.floor(scrollTop / rowHeight);
+    const endIndex = startIndex + visibleCount;
+
+    setIndices([startIndex, endIndex]);
+  };
+
+  const visibleRows = data.slice(indices[0], indices[1]);
+
+  return (
 
     <div className="p-10">
 
       <h1 className="text-2xl mb-6">Employee List</h1>
 
-      <table className="w-full border">
+      <div
+        className="border"
+        style={{
+          height: containerHeight,
+          overflowY: "auto",
+          position: "relative"
+        }}
+        onScroll={handleScroll}
+      >
 
-        <thead className="bg-gray-200">
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>City</th>
-            <th>Salary</th>
-          </tr>
-        </thead>
+        <div
+          style={{
+            height: data.length * rowHeight,
+            position: "relative"
+          }}
+        >
 
-        <tbody>
+          {visibleRows.map((item, index) => {
 
-        {data.map((item,index)=>(
-          <tr key={index} className="border">
-            <td>{item.id}</td>
-            <td>{item.name}</td>
-            <td>{item.city}</td>
-            <td>{item.salary}</td>
-          </tr>
-        ))}
+            const actualIndex = indices[0] + index;
 
-        </tbody>
+            return (
+              <div
+                key={item.id || actualIndex}
+                className="flex border-b bg-white"
+                style={{
+                  position: "absolute",
+                  top: actualIndex * rowHeight,
+                  height: rowHeight,
+                  width: "100%"
+                }}
+              >
 
-      </table>
+                <div className="w-1/4 p-2">{item.id}</div>
+                <div className="w-1/4 p-2">{item.name}</div>
+                <div className="w-1/4 p-2">{item.city}</div>
+                <div className="w-1/4 p-2">{item.salary}</div>
+
+              </div>
+            );
+          })}
+
+        </div>
+
+      </div>
 
     </div>
-  )
+  );
 }
